@@ -1,0 +1,18 @@
+version: 0.2
+
+# CodeBuild runs commands in phases. Here we only need the build phase
+# because this project is plain HTML/CSS and does not require compilation.
+phases:
+  build:
+    commands:
+      # Validate that the S3_BUCKET environment variable is set in CodeBuild.
+      - |
+        if [ -z "$S3_BUCKET" ]; then
+          echo "Error: S3_BUCKET environment variable is not set."
+          exit 1
+        fi
+      # Upload all site files in this repository to the target S3 bucket.
+      # --delete removes files from S3 that were deleted in the source.
+      - aws s3 sync . "s3://$S3_BUCKET" --delete --exclude "buildspec.yml"
+
+# artifacts are optional for direct S3 sync deployments, so none are defined.
