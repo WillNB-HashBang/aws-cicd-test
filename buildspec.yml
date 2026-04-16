@@ -14,5 +14,9 @@ phases:
       # Upload all site files in this repository to the target S3 bucket.
       # --delete removes files from S3 that were deleted in the source.
       - aws s3 sync . "s3://$S3_BUCKET" --delete --exclude "buildspec.yml"
+  post_build:
+    commands:
+      # Invalidate the CloudFront cache so the CDN serves the latest files immediately.
+      - aws cloudfront create-invalidation --distribution-id E371XGMV4Y282Z --paths "/*"
 
 # artifacts are optional for direct S3 sync deployments, so none are defined.
